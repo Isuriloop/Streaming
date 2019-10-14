@@ -1,0 +1,102 @@
+<html>
+<head>
+
+    <title>En Transmicion</title>
+    <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+</head>
+<body>
+    <div id="header">
+
+    </div>
+
+    <div align="center">
+            <br>  <h1>Streamig Media </h1>
+
+            <br><br><br>
+            <table >
+                    <tr>
+                        <td> 
+                            <div align="left">
+                            <video src="" id="video" style="width: 680px; height : 320px" autoplay="true"></video>
+                        </div>
+                        </td>
+                        <td><div id ="status">Status:</div><div id="logger"></div><br><br>
+                            <a href="index.html"><button type="button" class="btn btn-danger">Desconectar</button></a>
+                            <br><br><br><br><br><br><br><br>
+                        
+                        
+                        </td>
+                    </tr>
+            </table>
+
+    
+
+</div>   <br><br> 
+<canvas id="preview" style="display: none"></canvas>
+
+    <script type="text/javascript">
+
+  var canvas = document.getElementById("preview");
+  var context = canvas.getContext("2d");
+
+  canvas.width = 800;
+  canvas.height = 600;
+  context.width =canvas.width;
+  context.height=canvas.height;
+
+  var video =document.getElementById("video");
+  var socket = io();
+
+  function logger(msg){
+      $("#logger").text(msg);
+
+  }
+  function loadCam(stream){
+    video.srcObject =stream;
+    logger('Transmitiendo');
+  }
+
+  function loadFail(){
+      logger('Camara no conectada');
+  }
+
+ function viewVideo(video,context){
+    context.drawImage(video,0,0, context.width,context.height);
+    socket.emit('stream',canvas.toDataURL('/image/webp'));
+
+ }
+
+
+  $(function(){
+    navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || 
+    navigator.mozGetUserMedia || navigator.msgGetUserMedia);
+    if(navigator.getUserMedia){
+        navigator.getUserMedia({video : true},loadCam,loadFail);
+    }
+
+    setInterval(function(){
+viewVideo(video,context);
+
+    },10);
+  });
+   </script>
+    
+</body>
+</html>
+
+<style type="text/css">
+#logger{
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 20px;
+
+}
+#header{
+    width: 100%;
+    height: 70px;
+    background-color: rgb(0, 0, 0);
+    }
+
+</style>
